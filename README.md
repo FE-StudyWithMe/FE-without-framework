@@ -69,7 +69,7 @@
   </tr>
   <tr>
     <td rowspan="1">2주차</td>
-    <td>[3] DOM 이벤트 관리</td>
+    <td>[3장] DOM 이벤트 관리</td>
   </tr>
   <tr>
     <td rowspan="1">3주차</td>
