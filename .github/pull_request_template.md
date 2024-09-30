@@ -1,6 +1,6 @@
-## Description
+## 📃 Description
 
-## Check List
+## ✔︎ Check List
 
 <!--
 commit convention
@@ -12,7 +12,7 @@ docs : Add 해당 챕터
 - [ ] assignees & reviewers 확인를 확인해주세요!
 - [ ] label을 설정해주세요!
 
-## 기타
+## 🎸 기타
 
 <!--
 특이점이 없다면 적지 않으셔도 됩니다!
