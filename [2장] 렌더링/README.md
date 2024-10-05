@@ -55,11 +55,11 @@
 	</body>
     ```
 -  위 앱을 동적으로 만들기 위해서는 todo 리스트의 데이터를 가져와 해당 앱에 업데이트 시켜줘야한다.
-  - 필터링된 todo리스트를 가진 ul
-    `<ul class="todo-list">`
-  - 완료되지않은 todo수를 가진 span
+ 	 - 필터링된 todo리스트를 가진 ul
+    	`<ul class="todo-list">`
+ 	 - 완료되지않은 todo수를 가진 span
     `<span class="todo-count">1 Item Left</span>`
-  - selected 클래스를 오른쪽에 추가한 필터 유형을 가진 링크
+ 	 - selected 클래스를 오른쪽에 추가한 필터 유형을 가진 링크
     `<ul class="filters">`
     ```js
     //view.js
