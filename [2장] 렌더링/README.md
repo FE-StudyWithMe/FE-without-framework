@@ -11,16 +11,137 @@
   - <img width="382" alt="스크린샷 2024-10-05 오전 3 10 16" src="https://github.com/user-attachments/assets/1b013f94-c190-4cac-a7a6-31a9786bc110">
   - 방법 2 : stats.js 라이브러리 사용
   - 방법 3 : `requestAnimationFrame`을 사용한 사용자 정의 위젯 생성
-    - `requestAnimationFrame`은 모니터의 프레임의 주기(FPS)에 맞추어 일정한 시간 간격으로 랜더링 되게 해준다.
-    - [requestAnimationFrame 참고 자료](https://inpa.tistory.com/entry/%F0%9F%8C%90-requestAnimationFrame-%EA%B0%80%EC%9D%B4%EB%93%9C#requestanimationframe)
    
-- ## 💡 랜더링 함수 만들기 (todoMVC)
+   
+- ## 💡 랜더링 함수 만들기 ([todoMVC](https://todomvc.com/))
 - <img width="601" alt="스크린샷 2024-10-05 오전 2 26 02" src="https://github.com/user-attachments/assets/0eb9b9a9-49d7-477f-b690-aab723218a6c">
 - ### 단계 1 : 순수함수를 사용해 요소를 DOM에 랜더링하기
-<img width="250" alt="스크린샷 2024-10-05 오전 3 10 16" src="https://github.com/user-attachments/assets/6b73f6d2-d723-4bda-ab81-4b30f5b2c121">
-<img width="250" alt="스크린샷 2024-10-05 오전 3 10 16" src="https://github.com/user-attachments/assets/17fd276c-64c4-4701-9bac-8e32eabe1da8">
-<img width="250" alt="스크린샷 2024-10-05 오전 3 10 16" src="https://github.com/user-attachments/assets/38a61618-81b7-47d0-9398-05a103b70b28"><br/>
+  - ```js
+    //index.html
+    <body>
+    <section class="todoapp">
+        <header class="header">
+            <h1>todos</h1>
+            <input class="new-todo" placeholder="What needs to be done?" autofocus>
+        </header>
+        <section class="main">
+            <input id="toggle-all" class="toggle-all" type="checkbox">
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list">
+            </ul>
+        </section>
+        <footer class="footer">
+            <span class="todo-count">1 Item Left</span>
+            <ul class="filters">
+                <li>
+                    <a href="#/">All</a>
+                </li>
+                <li>
+                    <a href="#/active">Active</a>
+                </li>
+                <li>
+                    <a href="#/completed">Completed</a>
+                </li>
+            </ul>
+            <button class="clear-completed">Clear completed</button>
+        </footer>
+    </section>
+    <footer class="info">
+        <p>Double-click to edit a todo</p>
+        <p>Created by <a href="http://twitter.com/thestrazz86">Francesco Strazzullo</a></p>
+        <p>Thanks to <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
+    <script type="module" src="index.js"></script>
+	</body>
+    ```
+-  위 앱을 동적으로 만들기 위해서는 todo 리스트의 데이터를 가져와 해당 앱에 업데이트 시켜줘야한다.
+  - 필터링된 todo리스트를 가진 ul
+    `<ul class="todo-list">`
+  - 완료되지않은 todo수를 가진 span
+    `<span class="todo-count">1 Item Left</span>`
+  - selected 클래스를 오른쪽에 추가한 필터 유형을 가진 링크
+    `<ul class="filters">`
+    ```js
+    //view.js
+	const getTodoElement = todo => {
+	  const {
+	    text,
+	    completed
+	  } = todo
+	
+	  return `
+	  <li ${completed ? 'class="completed"' : ''}>
+	    <div class="view">
+	      <input 
+	        ${completed ? 'checked' : ''}
+	        class="toggle" 
+	        type="checkbox">
+	      <label>${text}</label>
+	      <button class="destroy"></button>
+	    </div>
+	    <input class="edit" value="${text}">
+	  </li>`
+	}
+
+	const getTodoCount = todos => {
+	  const notCompleted = todos
+	    .filter(todo => !todo.completed)
+	
+	  const { length } = notCompleted
+	  if (length === 1) {
+	    return '1 Item left'
+	  }
+	
+	  return `${length} Items left`
+	}
+	
+	export default (targetElement, state) => {
+	  const {
+	    currentFilter,
+	    todos
+	  } = state
+	
+	  const element = targetElement.cloneNode(true)
+	
+	  const list = element.querySelector('.todo-list')
+	  const counter = element.querySelector('.todo-count')
+	  const filters = element.querySelector('.filters')
+	
+	  list.innerHTML = todos.map(getTodoElement).join('')
+	  counter.textContent = getTodoCount(todos)
+	
+	  Array
+	    .from(filters.querySelectorAll('li a'))
+	    .forEach(a => {
+	      if (a.textContent === currentFilter) {
+	        a.classList.add('selected')
+	      } else {
+	        a.classList.remove('selected')
+	      }
+	    })
+	
+	  return element
+	}
+	//index.js
+	import getTodos from './getTodos.js'
+	import view from './view.js'
+	
+	const state = {
+	  todos: getTodos(),
+	  currentFilter: 'All'
+	}
+	
+	const main = document.querySelector('.todoapp')
+	
+	window.requestAnimationFrame(() => {
+	  const newMain = view(main, state)
+	  main.replaceWith(newMain)
+	})
+    ```
   - 가상 돔을 만들어 해당 가상 돔을 requestAnimationFrame으로 실제 돔에 반영하는 방법<br/>
+  - `requestAnimationFrame`은 모니터의 프레임의 주기(FPS)에 맞추어 일정한 시간 간격으로 랜더링 되게 해준다.
+    - [requestAnimationFrame 참고 자료](https://inpa.tistory.com/entry/%F0%9F%8C%90-requestAnimationFrame-%EA%B0%80%EC%9D%B4%EB%93%9C#requestanimationframe)
+    - [MDN 공식 문서](https://developer.mozilla.org/ko/docs/Web/API/Window/requestAnimationFrame)
   - 💣 여러가지 돔을 조작할 수 있는 함수가 단 하나뿐임, 한가지 작업을 여러가지 다른 방법으로 수행<br/>
   
   - ### 단계 2 : View함수의 분리 및 일관성 향상
@@ -58,6 +179,8 @@
       }
       ```
     - step 3: 구성 요소 래핑을 위한 고차함수 생성(고차함수 : 하나이상의 함수를 인자로 받는 함수)
+      - 모든 구성요소가 data-component속성의 값을 읽고(`const childComponents = element
+            .querySelectorAll('[data-component]')`) 올바른 함수를 자동으로 호출(`const child = registry[name]`)하는 기본 구성 요소에서 상속되어야한다.
       ```js
       const registry={}
       const renderWrapper = component => {
@@ -130,10 +253,11 @@
   - ⭐️⭐️⭐️⭐️⭐️ 이 섹션은 항플3주차 과제와 아주 유사합니다! 해당 주차 과제 다시보고오기! ⭐️⭐️⭐️⭐️⭐️
   - [해당 섹션 관련 준일님 블로그](https://junilhwang.github.io/TIL/Javascript/Design/Vanilla-JS-Virtual-DOM/#_1-%E1%84%8F%E1%85%A5%E1%86%B7%E1%84%91%E1%85%A9%E1%84%82%E1%85%A5%E1%86%AB%E1%84%90%E1%85%B3-%E1%84%80%E1%85%AE%E1%84%89%E1%85%A5%E1%86%BC)
   - ### 가상 DOM
+    - 
     - 동적으로 데이터 변동시 변경된 부분은 변경 될 때마다 바로 실제 DOM에 반영되는 것이 아니라 batching과정을 거쳐 전체 리랜더링이 아닌 변경 부분만 리랜더링 될 수 있게 한다. 그러니까 인형이 팔이 하자가 있다고 해서 인형전체를 새걸로 바꾸는게 아니라 팔만 바꾸는거랑 비슷하게 생각하면 된다..(?)
     - 이러한 과정 (reconcilation)을 통해 랜더링 엔진의 성능이 향상된다!!!
     - ![스크린샷 2024-10-05 오전 3 49 42](https://github.com/user-attachments/assets/f5cdeb8a-446b-414a-a4d8-929407d2f663)
-  - ### diff 함수
+  - ### diff 알고리즘
     - 속성 수가 다르다.
     - 하나 이상의 속성이 변경 됐다.
     - 노드에는 자식이 없으며 textContext가 다르다.
