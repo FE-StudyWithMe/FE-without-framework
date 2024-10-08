@@ -85,3 +85,69 @@
 	- 프레임 워크의 기술 부채
 		- 미래에 코드 변경이 어렵다는 점이 프레임워크에서의 기술 부채 비용
 		- 그렇기 때문에 합당한 이유로 프레임 워크를 선정 해야한다! 필요할때만 사용할 것
+
+## 1장을 마치며	- 공식문서에는 '사용자 인터페이스 구축을 위한 자바스크립트 라이브러리'
+	- 리액트의 선언적 패턴<br/> : 주요 제약 사항
+ ```
+		  📍 명령형 프로그래밍: "어떻게(How)" 할 것인지를 상세히 기술합니다. 
+		  📍 선언적 프로그래밍: "무엇을(What)" 원하는지를 기술합니다.
+ ```
+  - React에서의 선언적 패턴: React는 "어떻게 DOM을 변경할 것인가"가 아니라 "어떤 UI를 원하는가"를 기술
+	 - JSX: **HTML-like 문법으로 UI를 선언적으로 표현합니다.**
+	- 상태 관리: `useState`와 같은 훅을 통해 상태 변화를 선언적으로 관리합니다.
+	- 생명주기 관리: `useEffect`를 통해 부수 효과를 선언적으로 정의합니다.
+	- 책의 예시 : 리액트는 어떤 ui 변화시 직접 ui를 변화시키는것이 아닌 상태변경을 하게 한다. ex)isVisible
+- ### 💡 저자가 React가 프레임워크라고 믿는 이유
+    예시 1. 평소보는 코드
+     ```js
+	  import React, { useState } from 'react';
+
+        function ToggleButton() {
+      const [isOn, setIsOn] = useState(false);
+    
+      return (
+        <button onClick={() => setIsOn(!isOn)}>
+          {isOn ? 'ON' : 'OFF'}
+        </button>
+      );
+      }
+  ```
+
+  ⚠️ 주의 : 이 아래 기묘함! <br/>
+    예시 2. 동작은 같으나 다른 코드
+    ```js
+    import React, { useRef, useEffect } from 'react';
+    
+    function ToggleButton() {
+      const buttonRef = useRef(null);
+      
+      useEffect(() => {
+        const button = buttonRef.current;
+        let isOn = false;
+    
+        const toggleState = () => {
+          isOn = !isOn;
+          button.textContent = isOn ? 'ON' : 'OFF';
+        };
+    
+        button.addEventListener('click', toggleState);
+    
+        return () => button.removeEventListener('click', toggleState);
+      }, []);
+    
+      return <button ref={buttonRef}>OFF</button>;
+    }
+    ```
+**그니까 결국 저자는 사용자들이 기존 방식이 아닌 다른 방식을 사용했을때 "기묘함"을 느낀다면 이 자체가 프레임 워크적인 성격이 있지 않을까~ 생각한다는거다.**
+
+- ### 💡 프레임 워크의 역사
+	- 제이쿼리 -> 앵귤러JS ->리액트 -> 앵귤러 
+- ### 💡 기술 부채
+  - <img width="633" alt="스크린샷 2024-10-04 오후 8 54 17" src="https://github.com/user-attachments/assets/68fd4c17-f08b-44f0-b438-1a82ef4ecec7">
+  - 디자인이 허술할수록 쌓이고 쌓여 더욱 커지는 부채
+	- 프레임 워크의 기술 부채
+		- 미래에 코드 변경이 어렵다는 점이 프레임워크에서의 기술 부채 비용
+		- 그렇기 때문에 합당한 이유로 프레임 워크를 선정 해야한다! 필요할때만 사용할 것
+
+### 1장을 마치며
+1장을 통해 작가가 생각하는 프레임 워크의 정의와 라이브러리의 차이를 배우고 React가 과연 라이브러리인지 프레임워크인지 고민해보는 시간도 가졌던것 같다. 🥇
