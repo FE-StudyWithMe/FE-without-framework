@@ -6,10 +6,36 @@
   - [익스트림 프로그래밍](https://itwiki.kr/w/%EC%9D%B5%EC%8A%A4%ED%8A%B8%EB%A6%BC_%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%98%EB%B0%8D) : 애자일 방법론중 하나로 빠른 개발 속도를 유지하며 고객이 원하는 요구들을 지속적으로 피드백하는 방법
 - 가장 중요한 기능에 초점을 맞춰 개발 → 새로운 요구가 생기면 아키텍처를 지속적으로 발전
 
+### 📌 왜 YAGNI 원칙이 언급되었을까?
+- 프레임워크 없는 접근 방식에 대해 종종 듣게 되는 비판 중 하나, "아무도 유지 관리하지 않는 또 다른 프레임워크를 작성했다"
+- 이러한 비판을 피하기 위해서 **YAGNI 원칙을 적용하여 현재 당면한 문제만을 해결하고, 불필요하게 복잡한 아키텍처나 기능을 미리 추가하지 않는 것이 중요**
+  - 과도한 엔지니어링을 방지하고, 프로젝트의 유지보수를 용이하게 만듦
+
 ## 💡 DOM 이벤트
-- 웹 애플리케이션에서 발생하는 동작, 이에 따라 사용자는 반응할 수 있음
+- 웹 애플리케이션에서 **사용자 상호작용(예: 클릭, 키 입력)** 뿐만 아니라 **시스템 또는 브라우저 상태 변화(예: 페이지 로드, 네트워크 상태 변경**)에 의해 발생하는 동작
+- 이벤트 핸들러를 통해 처리
+  - 사용자가 트리거한 이벤트 : DOM 요소에 연결
+  - 뷰, 시스템 이벤트 : 이벤트 핸들러를 window 객체에 연결
+- 이로 인해 사용자 또는 시스템이 반응할 수 있음
+  
 <img width="600" alt="image" src="https://github.com/user-attachments/assets/8d8a8157-f1ba-4c5c-9713-c568fb607506">
+
 - [MDN에 정의된 이벤트](https://developer.mozilla.org/ko/docs/Web/API/Event) 외에 시스템 자체에서도 이벤트 생성 가능
+### 📌 DOM 이벤트의 종류
+1. 사용자 트리거 이벤트
+   - 마우스 이벤트 : `click`, `dblclick`, `mouseenter`, `mouseleave`, `mousemove`
+   - 이벤트 : `keydown`, `keypress`, `keyup`
+   - 폼 이벤트 : `submit`, `change`, `input`
+   - 터치 이벤트 : `touchstart`, `touchmove`, `touchend`
+
+2. 시스템 트리거 이벤트
+   - 문서 로딩 이벤트 : `load`, `DOMContentLoaded`
+   - 네트워크 이벤트 : `online`, `offline`
+   - 윈도우 이벤트 : `resize`, `scroll`
+   - 에러 이벤트 : `error`, `unhandledrejection`
+
+3. 커스텀 이벤트
+   - 개발자가 `CustomEvent` API를 사용하여 생성 및 트리거 가능
 
 ## 💡이벤트 처리
 ### 1. 속성에 핸들러 연결
@@ -95,51 +121,57 @@
     - 이벤트가 상위 요소들에게도 영향을 미치도록 하려는 경우 사용
     - Event 인터페이스의 stopPropagation 메서드를 통해 버블 체인 중지 가능
 - addEventListener의 세 번째 매개변수인 useCapture 값으로 Capturing/Bubbling 설정 가능
-- 캡쳐, 버블 단계 매커니즘 예시
-    ```html
-    <body>
-      <div>
-        This is a container
-        <button>click</div>
-      </div>
-    </body>
-    ```
-    <img width="188" alt="image" src="https://github.com/user-attachments/assets/00f8d98f-e404-4778-9de3-015cf5ba62ac">
-
-  - 캡쳐
-    ```html
-    <script>
-      const div = document.querySelector('div');
-      const button = document.querySelector('button');
-      
-      div.addEventListener('click', () => {
-        console.log('div click')
-      }, true)
-      button.addEventListener('click', () => {
-        console.log('button click')
-      }, true)
-    </script>
-    ```
-    <img width="136" alt="image" src="https://github.com/user-attachments/assets/e45a2ffe-d620-4ff9-a27b-ef7d7f495212">
-
-  - 버블
-    ```html
-    <script>
-      const div = document.querySelector('div');
-      const button = document.querySelector('button');
-      
-      div.addEventListener('click', () => {
-        console.log('div click')
-      }, false)
-      button.addEventListener('click', () => {
-        console.log('button click')
-      }, false)
-    </script>
-    ```
-    <img width="143" alt="image" src="https://github.com/user-attachments/assets/b7354767-73e9-4f7d-afd7-fdbd4dc6e2cf">
+  - 기본형 : `addEventListener(type, listener, useCapture)`
+  - useCapture = false : Bubbling 단계에 이벤트 핸들러를 추가 (defualt)
+  - useCapture = true : Capturing 단계에 이벤트 핸들러를 추가
+  - 캡쳐, 버블 예시
+      ```html
+      <body>
+        <div>
+          This is a container
+          <button>click</div>
+        </div>
+      </body>
+      ```
+      <img width="188" alt="image" src="https://github.com/user-attachments/assets/00f8d98f-e404-4778-9de3-015cf5ba62ac">
+  
+    - 캡쳐
+      ```html
+      <script>
+        const div = document.querySelector('div');
+        const button = document.querySelector('button');
+        
+        div.addEventListener('click', () => {
+          console.log('div click')
+        }, true)
+        button.addEventListener('click', () => {
+          console.log('button click')
+        }, true)
+      </script>
+      ```
+      <img width="136" alt="image" src="https://github.com/user-attachments/assets/e45a2ffe-d620-4ff9-a27b-ef7d7f495212">
+  
+    - 버블
+      ```html
+      <script>
+        const div = document.querySelector('div');
+        const button = document.querySelector('button');
+        
+        div.addEventListener('click', () => {
+          console.log('div click')
+        }, false)
+        button.addEventListener('click', () => {
+          console.log('button click')
+        }, false)
+      </script>
+      ```
+      <img width="143" alt="image" src="https://github.com/user-attachments/assets/b7354767-73e9-4f7d-afd7-fdbd4dc6e2cf">
 
 ### 5. 사용자 정의 이벤트 사용
 - CustomEvent 생성자 함수 사용하여 사용자 정의 이벤트 생성
+  - [`CustomEvent(typeArg, options)`](https://developer.mozilla.org/ko/docs/Web/API/CustomEvent/CustomEvent)
+    - DOM 이벤트 API를 사용하여 개발자가 애플리케이션의 특정 요구사항에 맞는 사용자 정의 이벤트를 만들고 처리
+    - options를 통해 함께 전달할 페이로드 지정 가능
     ```js
     const EVENT_NAME = 'FiveCharInputValue';
     const input = document.querySelector('input');
