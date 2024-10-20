@@ -47,13 +47,17 @@
     - 컴포넌트가 DOM에서 삭제될 때 호출됨
     - 정리 작업에 유용
 
+  ### 사용자 정의 요소 라이프 사이클
+  ![alt text](image-1.png)
+
   ### 어떻게 사용할 수 있을까?
 
   1. 사용자 정의 요소 생성
   2. 브라우저 컴포넌트 레지스트리에 추가
-    - `window.customElements` 속성의 `define` 속성 사용
+    - `window.customElements.define` 메서드 사용
     - 태그 이름(ex. 'hello-world')을 사용자 정의 요소 클래스에 연결하는 것을 의미
     - 이 단계를 거쳐야 사용자 정의 태그(<hello-world/>)를 생성한 컴포넌트로 사용할 수 있음
+
       ```js
       import HelloWorld from './components/HelloWorld.js'
 
@@ -190,6 +194,10 @@
         }
       }
       ```
+      |-|JS객체|DOM|HTML|
+      |------|---|---|---|
+      | setter | 변경 | 변경안됨 | 변경안됨 |
+      | setAttribure | 변경안됨 | 변경안됨 | 변경됨 |
     - 이 방법은 컴포넌트의 라이프사이클 동안 속성이 변경되도록 함
     - `attributeChangedCallback` 메서드는 변경된 속성의 이름, 속성의 이전 값, 속성의 새로운 값 세 가지 매개변수를 받음
     - 모든 속성이 `attributeChangedCallback`을 트리거 하지는 않으며 `observedAttributes` 배열에 나열된 속성만 트리거 한다
@@ -202,7 +210,7 @@
         }
         applyDiff(
           this,
-          this•firstElementChildj
+          this•firstElement,
           createDomElement(newValue)
         )
       }
@@ -235,7 +243,7 @@
     const ERROR_IMAGE = 'https://files-82ee7vgzc.now.sh'
     const LOADING_IMAGE = 'https://files-8bga2nnt0.now.sh'
 
-    const getGitHubAvatarllrl = async (user) => {
+    const getGitHubAvatarUrl = async (user) => {
       if (!user) {
         return
       }
@@ -265,7 +273,7 @@
         }
 
         render () {
-          window.requestAnimationFname(() => {
+          window.requestAnimationFrame(() => {
             this.innerHTML = ''
             const img = document.createElement('img')
             img.src = this.url
@@ -345,7 +353,7 @@
           this.url = await getGitHubAvatarUrl(user)
           this•onLoadAvatarComplete()
         } catch (e) {
-          this.url = ERROR_IHAGE
+          this.url = ERROR_IMAGE
           this.onLoadAvatarError(e)
         }
 
@@ -387,12 +395,45 @@
     - 두 종류의 이벤트에 이벤트 핸들러 연결
     - 올바른 핸들러가 호출됨
 
+## 📌 웹 구성 요소와 렌더링 함수
+
+### 코드 스타일
+- 웹 구성 요소
+  - `HTMLElement` 클래스를 확장해서 사용하므로 객체지향 프로그래밍을 요구함
+- 렌더링 함수
+  - 함수형 프로그래밍을 요구함
+- 간단한 렌더링 함수로 시작한 뒤에 라이브러리 릴리스가 필요하다면 웹 구성요소로 래핑하면 됨
+
+### 테스트 가능성
+- 렌더링 함수를 쉽게 테스트하려면 [Jest](https://jestjs.io/)와 같은 [JSDOM](https://github.com/jsdom/jsdom)과 통합한 테스트 러너를 활용하면 됨
+
+  > 책에서 Jest는 웹 컴포넌트 테스트를 지원하지 않는다고 했는데, 2020년 10월부터 Jest에서 지원한다는 내용을 발견해서 공유드립니다!
+  [관련 stackoverflow 답변](https://stackoverflow.com/a/64606792)
+
+### 휴대성 혹은 이식성(portability)
+- 기존 DOM 요소와 호환성이 보장되어야 다른 종류의 앱에서 동일하게 동작할 수 있음
+
+### 커뮤니티
+- 웹 구성요소 클래스는 대부분의 프레임워크에서 DOM으로 UI 요소를 작성하는 표준방법임
+- 규모가 크거나 빠르게 성장하는 팀에서 유용한 기능을 활용할 수 있음
+
+  |   -     | 웹 구성 요소 | 렌더링 함수 |
+  | ------- | ------- | ------ |
+  | 코드 스타일  | 클래스 기반  | 함수 기반  |
+  | 테스트 가능성 | 낮음      | 높음     |
+  | 휴대성     | 높음      | 낮음     |
+  | 커뮤니티    | 큼       | 작음     |
+
+- 휴대성 : 쉽게 사용가능한가 , 의존도가 낮은가, 재사용에 용이한가
+- 이식성(portability) : 소프트웨어나 컴포넌트가 다양한 환경에서 얼마나 쉽게 사용될 수 있는지의 정도
+
 ## 📌 사라지는 프레임워크
 
 - "사라지는 프레임워크 또는 "보이지 않는 프레임워크"는 Web Components를 기반으로 한 새로운 접근 방식임
 - 이 접근 방식의 핵심 아이디어는 개발 시에는 프레임워크의 편의성을 활용하고, 빌드 시에는 순수한 Web Components로 컴파일되는 것
 - 예로 Svelte와 Stencil.js가 있음 
 - 추가적인 프레임워크 코드가 필요 없어져 성능이 향상되고, 다른 프레임워크나 바닐라 JavaScript 프로젝트와의 호환성도 좋아짐
+![alt text](image-2.png)
 
 ## 📌 정리
 
