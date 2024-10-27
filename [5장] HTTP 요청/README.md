@@ -6,14 +6,12 @@
 
 - 1999년 이전에는 서버에서 데이터를 가져올 필요가 있는 경우 전체 페이지를 다시 로드해야 했다.
 - 1999년에 아웃룩, 지메일과 구글 지도 같은 애플리케이션들은 페이지를 완전히 다시 로드하지 않고 최초 페이지 로드 후 필요한 데이터만 서버에서 로드하는 새로운 기술을 사용하기 시작했다.
-    - 제시 제임스 가레트(Jesse James Garrett)가 이 기술을 ***비동기 자바스크립트 및 XML(Asynchronous JavaScript and XML)***의 약어인 AJAX로 명명했다.
-- AJAX 애플리케이션의 핵심은 ***XMLHttpRequest*** 객체다.
+    - 제시 제임스 가레트(Jesse James Garrett)가 이 기술을 <b>비동기 자바스크립트 및 XML(Asynchronous JavaScript and XML)</b>의 약어인 AJAX로 명명했다.
+    ![image](https://github.com/user-attachments/assets/16efecce-9c60-4d2e-8fb9-971158e4d1c0)
+- AJAX 애플리케이션의 핵심은 **XMLHttpRequest** 객체다.
     - 이 객체를 사용하면 HTTP 요청으로 서버에서 데이터를 가져올 수 있다.
     - W3C는 2006년 이 객체의 표준 규격 초안을 작성했다.
 - AJAX가 등장했을 때 웹 애플리케이션은 서버 데이터를 XML 형식으로 수신했으나, 지금은 JSON(자바스크립트 애플리케이션용) 형식이 사용된다.
-    
-    > PDF이신 분들 여기 사진 첨부 하나 해주실 수 있을까요.. (아날로그는 웁니다. 🥲)
-    > 
 
 
 ## 2. todo 리스트 REST 서버
@@ -109,6 +107,23 @@ const onAddClick = async () => {
 - 이 컨트롤러에서는 HTTP 클라이언트를 직접 사용하는 대신 HTTP 요청을 todos 모델 객체에 래핑했다.
 - 이런 캡슐화가 유용한 이유
     1. 테스트 가능성: todos 객체를 정적 데이터 세트를 반환하는 모의(mock)로 바꿀 수 있다. → 컨트롤러 독립적 테스트 가능
+        ```js
+          // 실제 HTTP 요청을 하는 대신 사용할 수 있는 mock 객체
+          const mockTodos = {
+            list: () => Promise.resolve([
+              { id: 1, text: "장보기", completed: false },
+              { id: 2, text: "운동하기", completed: true }
+            ]),
+            
+            create: (text) => Promise.resolve({ 
+              id: 3, 
+              text: text, 
+              completed: false 
+            }),
+
+            // ... 기타 메서드들
+          }
+        ```
     2. 가독성: 모델 객체는 코드는 좀 더 명확하게 만든다.
 
 ### 3-2. XMLHttpRequest
@@ -271,7 +286,10 @@ const request = async params => {
 - 세 버전의 클라이언트는 동일한 공용 API를 가진다.
 - 이런 아키텍처 특성으로 인해 최소한의 노력으로 HTTP 요청에 사용되는 라이브러리를 변경할 수 있다.
     - 즉, XMLHttpRequest에서 Fetch나 axios로 변경하는 데에 큰 노력이 필요하지 않다.
-    - (UML 다이어그램 사진.. 첨부 부탁합니다..)
+
+    > **💡 아키텍처 이해를 돕기 위한 UML 다이어그램**
+    >
+    > ![image](https://github.com/user-attachments/assets/ac598349-5fbf-4f4e-81f9-942999055494)
 - 만약 HTTP 클라이언트를 사용하지 않고 직접 axios를 사용하는 경우, Fetch API로 구현을 변경한다면 매우 비싸고 지루한 작업이 될 것이다.
 - 모델 객체에서 axios를 사용한다는 것은 인터페이스(HTTP 클라이언트)가 아닌 구현(라이브러리)을 프로그래밍하는 것을 의미한다.
 
@@ -291,6 +309,11 @@ const request = async params => {
 
 - Fetch API, XMLHttpRequest는 모두 브라우저에서만 동작한다.
 - Node.js나 리액트 네이티브 같은 다른 자바스크립트 환경에서 코드를 실행해야 한다면 axios가 좋은 솔루션이다.
+
+    > **💡 Fetch API도 Node.js에서 사용 가능!?**
+    > 
+    > - Node.js 18버전부터 Fetch API를 사용할 수 있는 것으로 확인된다. (2024.10)
+    > - [Node.js 18 release note](https://nodejs.org/en/blog/announcements/v18-release-announce)
 
 ### 4-3. 발전성
 
